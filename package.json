@@ -1,0 +1,32 @@
+{
+  "name": "bluesky-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Bluesky - posting, timeline, search, and social features",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "bluesky-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "bluesky",
+    "atproto",
+    "social-media"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@atproto/api": "^0.13.20",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3"
+  }
+}

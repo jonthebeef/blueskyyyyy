@@ -1,0 +1,279 @@
+# Bluesky MCP Server
+
+A Model Context Protocol (MCP) server for Bluesky. Enables AI assistants like Claude to post, search, engage, and manage your Bluesky presence.
+
+## Why Bluesky Over Threads?
+
+- **No OAuth nightmare** - Just username + app password
+- **No app review** - Start using immediately
+- **Better API** - Clean, well-documented AT Protocol
+- **Developer-friendly** - Built for the open web
+
+## Features
+
+### Posting & Content
+- **post** - Create text posts (up to 300 chars) with auto-detection of links and mentions
+- **reply** - Reply to any post
+- **create_thread** - Post multiple connected posts as a thread
+
+### Feeds & Timeline
+- **get_timeline** - Get your home feed
+- **get_author_feed** - Get posts from any user
+- **get_post_thread** - Get full conversation threads with replies
+
+### Search & Discovery
+- **search_posts** - Search all of Bluesky by keyword
+- **get_profile** - Get profile info for any user
+- **get_followers** - See who follows an account
+- **get_following** - See who an account follows
+
+### Engagement
+- **like_post** / **unlike_post** - Like and unlike posts
+- **repost** / **delete_repost** - Repost content
+- **follow** / **unfollow** - Follow and unfollow users
+- **get_post_likes** - See who liked a post
+- **get_post_reposts** - See who reposted a post
+
+## Installation
+
+### 1. Create a Bluesky App Password
+
+1. Go to https://bsky.app/settings/app-passwords
+2. Click "Add App Password"
+3. Give it a name (e.g., "Claude MCP")
+4. Copy the generated password (format: xxxx-xxxx-xxxx-xxxx)
+
+**Important:** This is NOT your main Bluesky password. App passwords are safer and can be revoked anytime.
+
+### 2. Install Dependencies
+
+```bash
+cd bluesky-mcp
+npm install
+npm run build
+```
+
+### 3. Configure Environment
+
+Create a `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your credentials:
+
+```
+BLUESKY_HANDLE=yourname.bsky.social
+BLUESKY_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+```
+
+### 4. Add to Claude Code
+
+Add to your `~/.config/claude-code/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "bluesky": {
+      "command": "node",
+      "args": ["/Users/jongrant/Desktop/threadsy/bluesky-mcp/dist/index.js"],
+      "env": {
+        "BLUESKY_HANDLE": "yourname.bsky.social",
+        "BLUESKY_APP_PASSWORD": "xxxx-xxxx-xxxx-xxxx"
+      }
+    }
+  }
+}
+```
+
+### 5. Restart Claude Code
+
+Restart Claude Code to load the MCP server.
+
+## Usage Examples
+
+Once configured, use natural language with Claude:
+
+### Posting
+```
+"Post to Bluesky: Just shipped a new feature!"
+"Reply to that post with uri at://... saying thanks"
+"Create a thread about my coding journey today"
+```
+
+### Feeds & Discovery
+```
+"Show me my Bluesky timeline"
+"What has @user.bsky.social been posting?"
+"Search Bluesky for posts about AI coding"
+```
+
+### Engagement
+```
+"Like the post at uri at://..."
+"Who follows me on Bluesky?"
+"Follow @interesting-person.bsky.social"
+"Show me who liked my latest post"
+```
+
+### Analytics
+```
+"Get my profile stats"
+"How many followers do I have?"
+"What's my most popular recent post?"
+```
+
+## Tools Reference
+
+### post
+
+Post to Bluesky with automatic link/mention detection.
+
+**Parameters:**
+- `text` (string, required) - Post content (max 300 chars)
+
+**Example:**
+```json
+{
+  "text": "Just built a Bluesky MCP server! 🚀"
+}
+```
+
+### reply
+
+Reply to an existing post.
+
+**Parameters:**
+- `uri` (string, required) - AT-URI of the post
+- `cid` (string, required) - CID of the post
+- `text` (string, required) - Reply text (max 300 chars)
+
+**Example:**
+```json
+{
+  "uri": "at://did:plc:abc123.../app.bsky.feed.post/xyz789",
+  "cid": "bafyreiabc123...",
+  "text": "Great post!"
+}
+```
+
+### create_thread
+
+Create a multi-post thread.
+
+**Parameters:**
+- `posts` (array, required) - Array of post texts (2-25 posts, max 300 chars each)
+
+**Example:**
+```json
+{
+  "posts": [
+    "Thread about building in public 1/3",
+    "First, you need to overcome the fear of sharing WIP code 2/3",
+    "Then just ship it and iterate based on feedback 3/3"
+  ]
+}
+```
+
+### search_posts
+
+Search Bluesky for posts matching a query.
+
+**Parameters:**
+- `query` (string, required) - Search term
+- `limit` (number, optional) - Results to return (max 100)
+
+**Example:**
+```json
+{
+  "query": "MCP servers",
+  "limit": 25
+}
+```
+
+### get_profile
+
+Get profile information for a user.
+
+**Parameters:**
+- `handle` (string, optional) - User handle (leave empty for yourself)
+
+**Example:**
+```json
+{
+  "handle": "user.bsky.social"
+}
+```
+
+## Understanding URIs and CIDs
+
+Bluesky uses AT Protocol which identifies posts with:
+- **URI** (AT-URI): Unique identifier like `at://did:plc:abc.../app.bsky.feed.post/xyz`
+- **CID**: Content identifier (cryptographic hash)
+
+You'll get these from search results, timelines, etc. and use them for replies, likes, reposts.
+
+## Rate Limits
+
+Bluesky is generally permissive with rate limits, but:
+- Be respectful and don't spam
+- Add delays between bulk operations
+- The thread tool automatically adds 1s delays
+
+## Troubleshooting
+
+### "Login failed"
+- Check that your handle is correct (include .bsky.social)
+- Verify your app password is copied correctly
+- Make sure you're using an **app password**, not your main password
+
+### "Invalid AT-URI"
+- URIs must start with `at://`
+- Get URIs from search results or timeline, don't construct them manually
+
+### "Record not found"
+- The post may have been deleted
+- Check that you copied the full URI and CID
+
+## Building Automations
+
+This MCP makes it easy to build:
+
+**Auto-poster** - Post your git commits daily
+```javascript
+// Get commits, generate summary, post to Bluesky
+const commits = await getCommits();
+const summary = summarizeWithAI(commits);
+await post({ text: summary });
+```
+
+**Mention monitor** - Get notified of replies
+```javascript
+// Search for mentions of your handle
+const mentions = await search_posts({ query: "@yourhandle" });
+```
+
+**Analytics tracker** - Track growth over time
+```javascript
+const profile = await get_profile();
+console.log(`Followers: ${profile.followersCount}`);
+```
+
+## Resources
+
+- [Bluesky](https://bsky.app/)
+- [AT Protocol Docs](https://docs.bsky.app/)
+- [Create App Password](https://bsky.app/settings/app-passwords)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
+
+## License
+
+MIT
+
+**Sources:**
+- [Complete Guide to Bluesky API Integration](https://www.ayrshare.com/complete-guide-to-bluesky-api-integration-authorization-posting-analytics-comments/)
+- [Posting via the Bluesky API](https://docs.bsky.app/blog/create-post)
+- [AT Protocol XRPC API](https://docs.bsky.app/docs/api/at-protocol-xrpc-api)
+- [app.bsky.feed.searchPosts](https://docs.bsky.app/docs/api/app-bsky-feed-search-posts)
+- [app.bsky.feed.getTimeline](https://docs.bsky.app/docs/api/app-bsky-feed-get-timeline)
