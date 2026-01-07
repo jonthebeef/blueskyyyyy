@@ -2,6 +2,8 @@
 
 A Model Context Protocol (MCP) server for Bluesky. Enables AI assistants like Claude to post, search, engage, and manage your Bluesky presence.
 
+Built by [@jonthebeef](https://bsky.app/profile/jonthebeef.bsky.social) with Claude Code.
+
 ## Why Bluesky Over Threads?
 
 - **No OAuth nightmare** - Just username + app password
@@ -45,10 +47,11 @@ A Model Context Protocol (MCP) server for Bluesky. Enables AI assistants like Cl
 
 **Important:** This is NOT your main Bluesky password. App passwords are safer and can be revoked anytime.
 
-### 2. Install Dependencies
+### 2. Clone and Install
 
 ```bash
-cd bluesky-mcp
+git clone https://github.com/jonthebeef/blueskyyyyy.git
+cd blueskyyyyy
 npm install
 npm run build
 ```
@@ -77,7 +80,7 @@ Add to your `~/.config/claude-code/mcp_config.json`:
   "mcpServers": {
     "bluesky": {
       "command": "node",
-      "args": ["/Users/jongrant/Desktop/threadsy/bluesky-mcp/dist/index.js"],
+      "args": ["/path/to/blueskyyyyy/dist/index.js"],
       "env": {
         "BLUESKY_HANDLE": "yourname.bsky.social",
         "BLUESKY_APP_PASSWORD": "xxxx-xxxx-xxxx-xxxx"
@@ -86,6 +89,8 @@ Add to your `~/.config/claude-code/mcp_config.json`:
   }
 }
 ```
+
+Replace `/path/to/blueskyyyyy` with the actual path where you cloned this repo.
 
 ### 5. Restart Claude Code
 

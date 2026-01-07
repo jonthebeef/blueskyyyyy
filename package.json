@@ -16,10 +16,20 @@
     "mcp",
     "bluesky",
     "atproto",
-    "social-media"
+    "social-media",
+    "claude",
+    "ai"
   ],
-  "author": "",
+  "author": "Jon Grant <@jonthebeef.bsky.social>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonthebeef/blueskyyyyy.git"
+  },
+  "homepage": "https://github.com/jonthebeef/blueskyyyyy#readme",
+  "bugs": {
+    "url": "https://github.com/jonthebeef/blueskyyyyy/issues"
+  },
   "dependencies": {
     "@atproto/api": "^0.13.20",
     "@modelcontextprotocol/sdk": "^1.0.4",
