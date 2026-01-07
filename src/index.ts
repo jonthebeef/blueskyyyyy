@@ -16,11 +16,11 @@ import { engagementTools } from './tools/engagement.js';
 dotenv.config();
 
 const BLUESKY_HANDLE = process.env.BLUESKY_HANDLE;
-const BLUESKY_APP_PASSWORD = process.env.BLUESKY_APP_PASSWORD;
+const BLUESKY_PASSWORD = process.env.BLUESKY_PASSWORD;
 
-if (!BLUESKY_HANDLE || !BLUESKY_APP_PASSWORD) {
+if (!BLUESKY_HANDLE || !BLUESKY_PASSWORD) {
   console.error(
-    'Error: BLUESKY_HANDLE and BLUESKY_APP_PASSWORD environment variables are required'
+    'Error: BLUESKY_HANDLE and BLUESKY_PASSWORD environment variables are required'
   );
   console.error(
     'Please set them in your .env file or environment before running the server'
@@ -30,11 +30,11 @@ if (!BLUESKY_HANDLE || !BLUESKY_APP_PASSWORD) {
 
 const client = new BlueskyClient({
   handle: BLUESKY_HANDLE,
-  appPassword: BLUESKY_APP_PASSWORD,
+  password: BLUESKY_PASSWORD,
 });
 
 // Login to Bluesky
-await client.login(BLUESKY_APP_PASSWORD);
+await client.login(BLUESKY_PASSWORD);
 
 const allTools = {
   ...postingTools,

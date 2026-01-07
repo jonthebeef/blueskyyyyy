@@ -1,6 +1,6 @@
 export interface BlueskyConfig {
   handle: string;
-  appPassword: string;
+  password: string;
   service?: string;
 }
 

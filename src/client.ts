@@ -12,10 +12,10 @@ export class BlueskyClient {
     this.handle = config.handle;
   }
 
-  async login(appPassword: string): Promise<void> {
+  async login(password: string): Promise<void> {
     await this.agent.login({
       identifier: this.handle,
-      password: appPassword,
+      password: password,
     });
   }
 

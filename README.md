@@ -1,15 +1,12 @@
-# Bluesky MCP Server
+# blueskyyyyy MCP Server
 
 A Model Context Protocol (MCP) server for Bluesky. Enables AI assistants like Claude to post, search, engage, and manage your Bluesky presence.
 
 Built by [@jonthebeef](https://bsky.app/profile/jonthebeef.bsky.social) with Claude Code.
 
-## Why Bluesky Over Threads?
+## Why This MCP?
 
-- **No OAuth nightmare** - Just username + app password
-- **No app review** - Start using immediately
-- **Better API** - Clean, well-documented AT Protocol
-- **Developer-friendly** - Built for the open web
+Saw [someone on Bluesky](https://bsky.app/profile/hydroxide.dev/post/3lmgtwzi4jk2m) say they tried every Bluesky MCP server on GitHub and couldn't get a single one working. Thought "how hard can it be?" - turns out not very. Built this in an afternoon with Claude Code for fun. It works. That's it.
 
 ## Features
 
@@ -38,16 +35,7 @@ Built by [@jonthebeef](https://bsky.app/profile/jonthebeef.bsky.social) with Cla
 
 ## Installation
 
-### 1. Create a Bluesky App Password
-
-1. Go to https://bsky.app/settings/app-passwords
-2. Click "Add App Password"
-3. Give it a name (e.g., "Claude MCP")
-4. Copy the generated password (format: xxxx-xxxx-xxxx-xxxx)
-
-**Important:** This is NOT your main Bluesky password. App passwords are safer and can be revoked anytime.
-
-### 2. Clone and Install
+### 1. Clone and Install
 
 ```bash
 git clone https://github.com/jonthebeef/blueskyyyyy.git
@@ -56,7 +44,7 @@ npm install
 npm run build
 ```
 
-### 3. Configure Environment
+### 2. Configure Environment
 
 Create a `.env` file:
 
@@ -64,14 +52,14 @@ Create a `.env` file:
 cp .env.example .env
 ```
 
-Edit `.env` with your credentials:
+Edit `.env` with your Bluesky credentials:
 
 ```
 BLUESKY_HANDLE=yourname.bsky.social
-BLUESKY_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+BLUESKY_PASSWORD=your-password
 ```
 
-### 4. Add to Claude Code
+### 3. Add to Claude Code
 
 Add to your `~/.config/claude-code/mcp_config.json`:
 
@@ -83,7 +71,7 @@ Add to your `~/.config/claude-code/mcp_config.json`:
       "args": ["/path/to/blueskyyyyy/dist/index.js"],
       "env": {
         "BLUESKY_HANDLE": "yourname.bsky.social",
-        "BLUESKY_APP_PASSWORD": "xxxx-xxxx-xxxx-xxxx"
+        "BLUESKY_PASSWORD": "your-password"
       }
     }
   }
@@ -92,7 +80,7 @@ Add to your `~/.config/claude-code/mcp_config.json`:
 
 Replace `/path/to/blueskyyyyy` with the actual path where you cloned this repo.
 
-### 5. Restart Claude Code
+### 4. Restart Claude Code
 
 Restart Claude Code to load the MCP server.
 
@@ -230,8 +218,7 @@ Bluesky is generally permissive with rate limits, but:
 
 ### "Login failed"
 - Check that your handle is correct (include .bsky.social)
-- Verify your app password is copied correctly
-- Make sure you're using an **app password**, not your main password
+- Verify your password is correct
 
 ### "Invalid AT-URI"
 - URIs must start with `at://`
@@ -269,7 +256,6 @@ console.log(`Followers: ${profile.followersCount}`);
 
 - [Bluesky](https://bsky.app/)
 - [AT Protocol Docs](https://docs.bsky.app/)
-- [Create App Password](https://bsky.app/settings/app-passwords)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 
 ## License
