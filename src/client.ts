@@ -38,11 +38,16 @@ export class BlueskyClient {
         rkey: options.replyTo.uri.split('/').pop()!,
       });
 
+      // If parent is itself a reply, use its root as our root
+      // Otherwise, the parent IS the root
+      const parentRecord = parentPost.value as any;
+      const root = parentRecord.reply?.root || {
+        uri: options.replyTo.uri,
+        cid: options.replyTo.cid,
+      };
+
       record.reply = {
-        root: {
-          uri: options.replyTo.uri,
-          cid: options.replyTo.cid,
-        },
+        root: root,
         parent: {
           uri: options.replyTo.uri,
           cid: options.replyTo.cid,
