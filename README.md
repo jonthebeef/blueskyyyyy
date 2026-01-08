@@ -11,7 +11,7 @@ Saw [someone on Bluesky](https://bsky.app/profile/hydroxide.dev/post/3lmgtwzi4jk
 ## Features
 
 ### Posting & Content
-- **post** - Create text posts (up to 300 chars) with auto-detection of links and mentions
+- **post** - Create text posts (up to 300 chars) with auto-detection of links and mentions. Optionally attach up to 4 images.
 - **reply** - Reply to any post
 - **create_thread** - Post multiple connected posts as a thread
 
@@ -121,15 +121,37 @@ Once configured, use natural language with Claude:
 
 ### post
 
-Post to Bluesky with automatic link/mention detection.
+Post to Bluesky with automatic link/mention detection. Optionally attach up to 4 images.
 
 **Parameters:**
 - `text` (string, required) - Post content (max 300 chars)
+- `images` (array, optional) - Array of images to attach (max 4). Each image needs either:
+  - `path` (string) - Absolute file path to an image (PNG or JPEG)
+  - `data` (string) - Base64-encoded image data
+  - `alt` (string, optional) - Alt text for accessibility
 
-**Example:**
+**Examples:**
+
+Text only:
 ```json
 {
   "text": "Just built a Bluesky MCP server! 🚀"
+}
+```
+
+With image from file:
+```json
+{
+  "text": "Check out this screenshot!",
+  "images": [{"path": "/path/to/image.png", "alt": "Screenshot description"}]
+}
+```
+
+With base64 image:
+```json
+{
+  "text": "Here's a photo",
+  "images": [{"data": "iVBORw0KGgo...", "alt": "Photo description"}]
 }
 ```
 
