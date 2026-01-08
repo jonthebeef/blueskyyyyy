@@ -49,6 +49,40 @@ Example: {"query": "AI coding tools", "limit": 25}`,
     },
   },
 
+  update_profile: {
+    description: `Update your Bluesky profile. You can update display name and/or bio (description).
+
+Example: {"description": "New bio text here"}`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        displayName: {
+          type: 'string',
+          description: 'New display name',
+        },
+        description: {
+          type: 'string',
+          description: 'New bio/description',
+        },
+      },
+    },
+    handler: async (
+      args: { displayName?: string; description?: string },
+      client: BlueskyClient
+    ) => {
+      await client.updateProfile(args);
+
+      return {
+        success: true,
+        updated: {
+          displayName: args.displayName ? true : false,
+          description: args.description ? true : false,
+        },
+        message: 'Profile updated successfully',
+      };
+    },
+  },
+
   get_profile: {
     description: `Get profile information for a Bluesky user. If no handle is provided, returns your own profile.
 

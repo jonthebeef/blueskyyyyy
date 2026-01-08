@@ -165,4 +165,14 @@ export class BlueskyClient {
     const response = await this.agent.getRepostedBy({ uri, limit });
     return response.data.repostedBy;
   }
+
+  async updateProfile(updates: { displayName?: string; description?: string }) {
+    await this.agent.upsertProfile((existing) => {
+      return {
+        ...existing,
+        displayName: updates.displayName ?? existing?.displayName,
+        description: updates.description ?? existing?.description,
+      };
+    });
+  }
 }
