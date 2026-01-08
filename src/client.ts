@@ -21,7 +21,7 @@ export class BlueskyClient {
 
   async post(text: string, options?: {
     replyTo?: { uri: string; cid: string };
-    images?: Array<{ data: Uint8Array; alt?: string }>;
+    images?: Array<{ data: Uint8Array; alt?: string; encoding?: string }>;
   }): Promise<PostResult> {
     const rt = new RichText({ text });
     await rt.detectFacets(this.agent);
@@ -59,7 +59,7 @@ export class BlueskyClient {
       const uploadedImages = await Promise.all(
         options.images.map(async (img) => {
           const response = await this.agent.uploadBlob(img.data, {
-            encoding: 'image/jpeg',
+            encoding: img.encoding || 'image/jpeg',
           });
           return {
             alt: img.alt || '',

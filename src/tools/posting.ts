@@ -1,13 +1,45 @@
 import { BlueskyClient } from '../client.js';
 
+// Helper to convert base64 to Uint8Array
+function base64ToUint8Array(base64: string): Uint8Array {
+  // Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
+  const base64Data = base64.includes(',') ? base64.split(',')[1] : base64;
+  const binaryString = atob(base64Data);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// Helper to detect image encoding from base64 data URL or raw data
+function detectImageEncoding(base64: string): 'image/jpeg' | 'image/png' {
+  if (base64.startsWith('data:image/png')) {
+    return 'image/png';
+  }
+  if (base64.startsWith('data:image/jpeg') || base64.startsWith('data:image/jpg')) {
+    return 'image/jpeg';
+  }
+  // Check magic bytes if no data URL prefix
+  const data = base64.includes(',') ? base64.split(',')[1] : base64;
+  const decoded = atob(data.slice(0, 16));
+  // PNG magic bytes: 137 80 78 71
+  if (decoded.charCodeAt(0) === 137 && decoded.charCodeAt(1) === 80) {
+    return 'image/png';
+  }
+  // Default to JPEG
+  return 'image/jpeg';
+}
+
 export const postingTools = {
   post: {
-    description: `Post to Bluesky. Supports text posts up to 300 characters, with automatic link and mention detection.
+    description: `Post to Bluesky. Supports text posts up to 300 characters, with automatic link and mention detection. Optionally attach up to 4 images.
 
 Examples:
 - Simple text: {"text": "Just shipped a new feature!"}
 - With mention: {"text": "Great work @handle.bsky.social!"}
-- With link: {"text": "Check this out https://example.com"}`,
+- With link: {"text": "Check this out https://example.com"}
+- With image: {"text": "Check this out!", "images": [{"data": "base64...", "alt": "Description"}]}`,
     inputSchema: {
       type: 'object',
       properties: {
@@ -16,11 +48,39 @@ Examples:
           description: 'The text content of the post (max 300 characters)',
           maxLength: 300,
         },
+        images: {
+          type: 'array',
+          description: 'Optional array of images to attach (max 4). Each image needs base64-encoded data.',
+          maxItems: 4,
+          items: {
+            type: 'object',
+            properties: {
+              data: {
+                type: 'string',
+                description: 'Base64-encoded image data (can include data URL prefix)',
+              },
+              alt: {
+                type: 'string',
+                description: 'Alt text for accessibility',
+              },
+            },
+            required: ['data'],
+          },
+        },
       },
       required: ['text'],
     },
-    handler: async (args: { text: string }, client: BlueskyClient) => {
-      const result = await client.post(args.text);
+    handler: async (args: { text: string; images?: Array<{ data: string; alt?: string }> }, client: BlueskyClient) => {
+      // Convert base64 images to Uint8Array format the client expects
+      const processedImages = args.images?.map((img) => ({
+        data: base64ToUint8Array(img.data),
+        alt: img.alt,
+        encoding: detectImageEncoding(img.data),
+      }));
+
+      const result = await client.post(args.text, {
+        images: processedImages,
+      });
 
       return {
         success: true,
