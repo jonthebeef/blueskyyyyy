@@ -175,4 +175,105 @@ export class BlueskyClient {
       };
     });
   }
+
+  async deletePost(uri: string) {
+    await this.agent.deletePost(uri);
+  }
+
+  async quotePost(text: string, quoteUri: string, quoteCid: string): Promise<PostResult> {
+    const rt = new RichText({ text });
+    await rt.detectFacets(this.agent);
+
+    const record: any = {
+      text: rt.text,
+      facets: rt.facets,
+      createdAt: new Date().toISOString(),
+      embed: {
+        $type: 'app.bsky.embed.record',
+        record: {
+          uri: quoteUri,
+          cid: quoteCid,
+        },
+      },
+    };
+
+    const result = await this.agent.post(record);
+
+    return {
+      uri: result.uri,
+      cid: result.cid,
+      url: `https://bsky.app/profile/${this.handle}/post/${result.uri.split('/').pop()}`,
+    };
+  }
+
+  async getNotifications(limit: number = 50) {
+    const response = await this.agent.listNotifications({ limit });
+    return response.data.notifications;
+  }
+
+  async getSuggestedFollows(limit: number = 50) {
+    const response = await this.agent.app.bsky.actor.getSuggestions({ limit });
+    return response.data.actors;
+  }
+
+  async updateAvatar(data: Uint8Array, encoding: string) {
+    const uploadResponse = await this.agent.uploadBlob(data, { encoding });
+    await this.agent.upsertProfile((existing) => {
+      return {
+        ...existing,
+        avatar: uploadResponse.data.blob,
+      };
+    });
+    return uploadResponse.data.blob;
+  }
+
+  async getLists(handle?: string, limit: number = 50) {
+    const targetHandle = handle || this.handle;
+    const response = await this.agent.app.bsky.graph.getLists({
+      actor: targetHandle,
+      limit,
+    });
+    return response.data.lists;
+  }
+
+  async getList(listUri: string, limit: number = 50) {
+    const response = await this.agent.app.bsky.graph.getList({
+      list: listUri,
+      limit,
+    });
+    return response.data;
+  }
+
+  async createList(name: string, description: string, purpose: 'curatelist' | 'modlist') {
+    const response = await this.agent.app.bsky.graph.list.create(
+      { repo: this.agent.session!.did },
+      {
+        name,
+        description,
+        purpose: `app.bsky.graph.defs#${purpose}`,
+        createdAt: new Date().toISOString(),
+      }
+    );
+    return response;
+  }
+
+  async addToList(listUri: string, subjectDid: string) {
+    const response = await this.agent.app.bsky.graph.listitem.create(
+      { repo: this.agent.session!.did },
+      {
+        list: listUri,
+        subject: subjectDid,
+        createdAt: new Date().toISOString(),
+      }
+    );
+    return response;
+  }
+
+  async removeFromList(listItemUri: string) {
+    const rkey = listItemUri.split('/').pop()!;
+    await this.agent.app.bsky.graph.listitem.delete({
+      repo: this.agent.session!.did,
+      rkey,
+    });
+  }
 }

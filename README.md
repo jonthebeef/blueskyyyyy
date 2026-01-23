@@ -14,6 +14,8 @@ Saw [someone on Bluesky](https://bsky.app/profile/hydroxide.dev/post/3lmgtwzi4jk
 - **post** - Create text posts (up to 300 chars) with auto-detection of links and mentions. Optionally attach up to 4 images.
 - **reply** - Reply to any post
 - **create_thread** - Post multiple connected posts as a thread
+- **quote_post** - Quote post (repost with your own comment)
+- **delete_post** - Delete one of your posts
 
 ### Feeds & Timeline
 - **get_timeline** - Get your home feed
@@ -25,6 +27,8 @@ Saw [someone on Bluesky](https://bsky.app/profile/hydroxide.dev/post/3lmgtwzi4jk
 - **get_profile** - Get profile info for any user
 - **get_followers** - See who follows an account
 - **get_following** - See who an account follows
+- **get_notifications** - Get your notifications (likes, reposts, follows, mentions, replies)
+- **get_suggested_follows** - Get suggested accounts to follow based on your network
 
 ### Engagement
 - **like_post** / **unlike_post** - Like and unlike posts
@@ -32,6 +36,17 @@ Saw [someone on Bluesky](https://bsky.app/profile/hydroxide.dev/post/3lmgtwzi4jk
 - **follow** / **unfollow** - Follow and unfollow users
 - **get_post_likes** - See who liked a post
 - **get_post_reposts** - See who reposted a post
+
+### Profile Management
+- **update_profile** - Update your display name and/or bio
+- **update_avatar** - Update your profile picture (from file path or base64)
+
+### Lists
+- **get_lists** - Get lists created by an account
+- **get_list** - Get members of a specific list
+- **create_list** - Create a new curate list or mod list
+- **add_to_list** - Add a user to one of your lists
+- **remove_from_list** - Remove a user from a list
 
 ## Installation
 
@@ -218,6 +233,145 @@ Get profile information for a user.
 ```json
 {
   "handle": "user.bsky.social"
+}
+```
+
+### delete_post
+
+Delete one of your posts.
+
+**Parameters:**
+- `uri` (string, required) - The AT-URI of the post to delete
+
+**Example:**
+```json
+{
+  "uri": "at://did:plc:abc123.../app.bsky.feed.post/xyz789"
+}
+```
+
+### quote_post
+
+Quote post (repost with your own comment).
+
+**Parameters:**
+- `uri` (string, required) - The AT-URI of the post to quote
+- `cid` (string, required) - The CID of the post to quote
+- `text` (string, required) - Your comment (max 300 chars)
+
+**Example:**
+```json
+{
+  "uri": "at://did:plc:abc123.../app.bsky.feed.post/xyz789",
+  "cid": "bafyreiabc123...",
+  "text": "This is so true!"
+}
+```
+
+### get_notifications
+
+Get your notifications.
+
+**Parameters:**
+- `limit` (number, optional) - Number of notifications (default: 50, max: 100)
+
+**Example:**
+```json
+{
+  "limit": 50
+}
+```
+
+### get_suggested_follows
+
+Get suggested accounts to follow.
+
+**Parameters:**
+- `limit` (number, optional) - Number of suggestions (default: 25, max: 100)
+
+**Example:**
+```json
+{
+  "limit": 25
+}
+```
+
+### update_profile
+
+Update your display name and/or bio.
+
+**Parameters:**
+- `displayName` (string, optional) - New display name
+- `description` (string, optional) - New bio
+
+**Example:**
+```json
+{
+  "description": "Product person. Vibe coder. Manchester."
+}
+```
+
+### update_avatar
+
+Update your profile picture.
+
+**Parameters:**
+- `path` (string, optional) - File path to image (PNG or JPEG)
+- `data` (string, optional) - Base64-encoded image data
+
+**Example:**
+```json
+{
+  "path": "/path/to/avatar.jpg"
+}
+```
+
+### get_lists
+
+Get lists created by an account.
+
+**Parameters:**
+- `handle` (string, optional) - User handle (leave empty for yourself)
+- `limit` (number, optional) - Number of lists (default: 50, max: 100)
+
+**Example:**
+```json
+{
+  "handle": "user.bsky.social"
+}
+```
+
+### create_list
+
+Create a new list.
+
+**Parameters:**
+- `name` (string, required) - List name
+- `description` (string, required) - List description
+- `purpose` (string, required) - "curatelist" or "modlist"
+
+**Example:**
+```json
+{
+  "name": "Tech People",
+  "description": "Interesting tech accounts",
+  "purpose": "curatelist"
+}
+```
+
+### add_to_list
+
+Add a user to a list.
+
+**Parameters:**
+- `list_uri` (string, required) - The AT-URI of the list
+- `did` (string, required) - The DID of the user to add
+
+**Example:**
+```json
+{
+  "list_uri": "at://did:plc:.../app.bsky.graph.list/abc",
+  "did": "did:plc:xyz123..."
 }
 ```
 

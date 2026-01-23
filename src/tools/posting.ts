@@ -212,4 +212,68 @@ Example: {"posts": ["First post in the thread", "Second post", "Third post"]}`,
       };
     },
   },
+
+  delete_post: {
+    description: `Delete one of your posts. Provide the AT-URI of the post to delete.
+
+Example: {"uri": "at://did:plc:.../app.bsky.feed.post/..."}`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        uri: {
+          type: 'string',
+          description: 'The AT-URI of the post to delete',
+        },
+      },
+      required: ['uri'],
+    },
+    handler: async (args: { uri: string }, client: BlueskyClient) => {
+      await client.deletePost(args.uri);
+
+      return {
+        success: true,
+        deleted_uri: args.uri,
+        message: 'Post deleted successfully!',
+      };
+    },
+  },
+
+  quote_post: {
+    description: `Quote post (repost with comment). Creates a new post that embeds the original post.
+
+Example: {"uri": "at://did:plc:.../app.bsky.feed.post/...", "cid": "bafyrei...", "text": "This is so true!"}`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        uri: {
+          type: 'string',
+          description: 'The AT-URI of the post to quote',
+        },
+        cid: {
+          type: 'string',
+          description: 'The CID of the post to quote',
+        },
+        text: {
+          type: 'string',
+          description: 'Your comment on the quoted post (max 300 characters)',
+          maxLength: 300,
+        },
+      },
+      required: ['uri', 'cid', 'text'],
+    },
+    handler: async (
+      args: { uri: string; cid: string; text: string },
+      client: BlueskyClient
+    ) => {
+      const result = await client.quotePost(args.text, args.uri, args.cid);
+
+      return {
+        success: true,
+        uri: result.uri,
+        cid: result.cid,
+        url: result.url,
+        message: `Quote post created successfully! View at: ${result.url}`,
+      };
+    },
+  },
 };
